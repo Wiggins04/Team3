@@ -1,3 +1,6 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
 print ("Welcome")
 
 def option_a():
@@ -18,9 +21,78 @@ def option_c():
     #code for algorithm c goes here
 
 def option_d():
-    print("Enter dates for average calculation")
-    dates = input("")
-    #code for algorithm d goes here
+   # change path when necessary
+   file_path = r'C:\Users\samco\OneDrive\Documents\4216 group work\sealevel.csv'
+
+   # columns to be extracted
+   columns_to_extract = ['Year', 'GMSL_noGIA', 'SmoothedGSML_noGIA', 'GMSL_GIA', 'SmoothedGSML_GIA', 'SmoothedGSML_GIA_sigremoved']
+
+   def validate_years(data, start_year, end_year):
+       min_year = data['Year'].min()
+       max_year = data['Year'].max()
+       return min_year <= start_year <= max_year and min_year <= end_year <= max_year
+
+   try:
+       # read csv file into a dataimport pandas as pd
+       full_data = pd.read_csv(file_path)
+
+       # get user input for the years they want data from
+       start_year = int(input("Enter the start year: "))
+       end_year = int(input("Enter the end year: "))
+
+       # validate user input
+       if validate_years(full_data, start_year, end_year):
+           filtered_data = full_data.loc[(full_data['Year'] >= start_year) & (full_data['Year'] <= end_year), columns_to_extract]
+           # remove rows where GMSL_noGIA is zero as to avoid any errors
+           filtered_data_noGIA = filtered_data[filtered_data['GMSL_noGIA'] != 0]
+           # calculate average percentage change of SmoothedGSML_noGIA relative to GMSL_noGIA
+           smoothed_noGIA_avg_change = ((filtered_data_noGIA['SmoothedGSML_noGIA'] - filtered_data_noGIA['GMSL_noGIA']) / filtered_data_noGIA['GMSL_noGIA']).mean() * 100
+           # remove rows where GMSL_GIA is zero
+           filtered_data_GIA = filtered_data[filtered_data['GMSL_GIA'] != 0]
+           # calculate average percentage change of SmoothedGSML_GIA relative to GMSL_GIA
+           smoothed_GIA_avg_change = ((filtered_data_GIA['SmoothedGSML_GIA'] - filtered_data_GIA['GMSL_GIA']) / filtered_data_GIA['GMSL_GIA']).mean() * 100
+
+           # Display the results
+           print(f"Average percentage change of SmoothedGSML_noGIA relative to GMSL_noGIA: {smoothed_noGIA_avg_change:.2f}%")
+           print(f"Average percentage change of SmoothedGSML_GIA relative to GMSL_GIA: {smoothed_GIA_avg_change:.2f}%")
+
+           # create a graph with subplots
+           fig, axs = plt.subplots(3, 1, figsize=(10, 15))
+
+           # Plot 1: Comparison of GMSL_noGIA and SmoothedGSML_noGIA
+           axs[0].plot(filtered_data['Year'], filtered_data['GMSL_noGIA'], label='GMSL_noGIA', color='blue', linestyle='-')
+           axs[0].plot(filtered_data['Year'], filtered_data['SmoothedGSML_noGIA'], label='SmoothedGSML_noGIA', color='red', linestyle='-')
+           axs[0].set_xlabel('Year')
+           axs[0].set_ylabel('Sea Level (mm)')
+           axs[0].set_title('Effect of Smoothing Filter (No GIA)')
+           axs[0].legend()
+
+           # Plot 2: Comparison of GMSL_GIA and SmoothedGSML_GIA
+           axs[1].plot(filtered_data['Year'], filtered_data['GMSL_GIA'], label='GMSL_GIA', color='blue', linestyle='-')
+           axs[1].plot(filtered_data['Year'], filtered_data['SmoothedGSML_GIA'], label='SmoothedGSML_GIA', color='red', linestyle='-')
+           axs[1].set_xlabel('Year')
+           axs[1].set_ylabel('Sea Level (mm)')
+           axs[1].set_title('Effect of Smoothing Filter (GIA)')
+           axs[1].legend()
+
+           # Plot 3: Comparison of SmoothedGSML_GIA and SmoothedGSML_GIA_sigremoved
+           axs[2].plot(filtered_data['Year'], filtered_data['SmoothedGSML_GIA'], label='SmoothedGSML_GIA', color='blue', linestyle='-')
+           axs[2].plot(filtered_data['Year'], filtered_data['SmoothedGSML_GIA_sigremoved'], label='SmoothedGSML_GIA_sigremoved', color='red', linestyle='-')
+           axs[2].set_xlabel('Year')
+           axs[2].set_ylabel('Sea Level (mm)')
+           axs[2].set_title('Effect of Smoothing Filter (GIA vs GIA_sigremoved)')
+           axs[2].legend()
+           plt.tight_layout()
+           plt.show()
+
+       else:
+           print("Error: Start and end years are not within the range of available years in the dataset.")
+
+   except FileNotFoundError:
+       print(f"Error: File '{file_path}' not found.")
+
+   except ValueError:
+       print("Error: Please enter valid numeric values for start and end years.")
 
 def option_e():
     print("Enter dates for average calculation")
@@ -32,7 +104,7 @@ def mainMenu():
     print ("-1 OPTION A") # Replace this name later on with the function provided
     print ("-2 OPTION B") # Replace this name later on with the function provided
     print ("-3 OPTION C") # Replace this name later on with the function provided
-    print ("-4 OPTION D") # Replace this name later on with the function provided
+    print ("-4 Smoothing filter effect") 
     print ("-6 OPTION E") # Replace this name later on with the function provided
     #Any extra options should be entered here
     print ("-4 Quit")
@@ -48,10 +120,10 @@ def mainMenu():
             option_c()
             break
         elif selection == "4":
-            option_c()
+            option_d()
             break
         elif selection == "5":
-            option_c()
+            option_e()
             break
         elif selection == "6":
             return
