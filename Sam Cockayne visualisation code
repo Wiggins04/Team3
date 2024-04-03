@@ -17,11 +17,23 @@ def option_c():
     dates = input("")
     #code for algorithm c goes here
 
+def option_d():
+    print("Enter dates for average calculation")
+    dates = input("")
+    #code for algorithm d goes here
+
+def option_e():
+    print("Enter dates for average calculation")
+    dates = input("")
+    #code for algorithm e goes here
+
 def mainMenu():
     print ("Select an option")
     print ("-1 OPTION A") # Replace this name later on with the function provided
     print ("-2 OPTION B") # Replace this name later on with the function provided
     print ("-3 OPTION C") # Replace this name later on with the function provided
+    print ("-4 OPTION D") # Replace this name later on with the function provided
+    print ("-6 OPTION E") # Replace this name later on with the function provided
     #Any extra options should be entered here
     print ("-4 Quit")
     while True:
@@ -36,6 +48,12 @@ def mainMenu():
             option_c()
             break
         elif selection == "4":
+            option_c()
+            break
+        elif selection == "5":
+            option_c()
+            break
+        elif selection == "6":
             return
         else:
             print("Please select a valid option")
