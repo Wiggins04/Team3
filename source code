@@ -1,0 +1,54 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import linregress
+import mplcursors
+import seaborn as sns
+
+print ("Welcome")
+
+def option_a():
+    
+
+def option_b():
+    
+
+def option_c():
+   
+
+def option_d():
+   
+def option_e():
+    
+
+def mainMenu():
+    print ("Select an option")
+    print ("-1 OPTION A") # Replace this name later on with the function provided
+    print ("-2 OPTION B") # Replace this name later on with the function provided
+    print ("-3 OPTION C") # Replace this name later on with the function provided
+    print ("-4 Smoothing filter effect") 
+    print ("-6 OPTION E") # Replace this name later on with the function provided
+    #Any extra options should be entered here
+    print ("-4 Quit")
+    while True:
+        selection = input("")
+        if selection == "1":
+            option_a()
+            break
+        elif selection == "2":
+            option_b()
+            break
+        elif selection == "3":
+            option_c()
+            break
+        elif selection == "4":
+            option_d()
+            break
+        elif selection == "5":
+            option_e()
+            break
+        elif selection == "6":
+            return
+        else:
+            print("Please select a valid option")
+mainMenu()#calling the main menu
