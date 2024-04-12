@@ -13,16 +13,36 @@ def option_c():
         selected_columns = ['Year', 'TotalWeightedObservations', 'GMSL_noGIA', 'GMSL_GIA']
         selected_data = sea_level_data[selected_columns]
 
-        start_year = int(input("Enter the start year: "))
-        end_year = int(input("Enter the end year: "))
+        min_year = selected_data['Year'].min()
+        max_year = selected_data['Year'].max()
+
+        # Getting user input for start year with validation
+        start_year = None
+        while start_year is None:
+            try:
+                start_year = int(input(f"Enter the start year ({min_year}-{max_year}): "))
+                if start_year < min_year or start_year > max_year:
+                    print(f"Error: Start year must be between {min_year} and {max_year}.")
+                    start_year = None
+            except ValueError:
+                print("Error: Please enter a valid numeric value.")
+
+        # Getting user input for end year with validation
+        end_year = None
+        while end_year is None:
+            try:
+                end_year = int(input(f"Enter the end year ({min_year}-{max_year}): "))
+                if end_year < min_year or end_year > max_year:
+                    print(f"Error: End year must be between {min_year} and {max_year}.")
+                    end_year = None
+                elif end_year < start_year:
+                    print("Error: End year must be greater than or equal to start year.")
+                    end_year = None
+            except ValueError:
+                print("Error: Please enter a valid numeric value.")
 
         # Filtering data based on user input years
         filtered_data = selected_data[(selected_data['Year'] >= start_year) & (selected_data['Year'] <= end_year)]
-
-        # Calculating average values
-        avg_total_weighted_obs = filtered_data['TotalWeightedObservations'].mean()
-        avg_gmsl_noGIA = filtered_data['GMSL_noGIA'].mean()
-        avg_gmsl_GIA = filtered_data['GMSL_GIA'].mean()
 
         # Calculating interquartile range for TotalWeightedObservations
         Q1 = filtered_data['TotalWeightedObservations'].quantile(0.25)
@@ -32,31 +52,48 @@ def option_c():
         # Removing outliers
         filtered_data_no_outliers = filtered_data[~((filtered_data['TotalWeightedObservations'] < (Q1 - 1.5 * IQR)) | (filtered_data['TotalWeightedObservations'] > (Q3 + 1.5 * IQR)))]
 
-        # Recalculating average after removing outliers
-        avg_total_weighted_obs_no_outliers = filtered_data_no_outliers['TotalWeightedObservations'].mean()
-        avg_gmsl_noGIA_no_outliers = filtered_data_no_outliers['GMSL_noGIA'].mean()
-        avg_gmsl_GIA_no_outliers = filtered_data_no_outliers['GMSL_GIA'].mean()
-
-        # Displaying the results
-        print(f"Average Total Weighted Observations from {start_year} to {end_year}: {avg_total_weighted_obs:.2f}")
-        print(f"Average GMSL_noGIA from {start_year} to {end_year}: {avg_gmsl_noGIA:.2f}")
-        print(f"Average GMSL_GIA from {start_year} to {end_year}: {avg_gmsl_GIA:.2f}")
-        print(f"IQR for TotalWeightedObservations: {IQR:.2f}")
-        print(f"Average Total Weighted Observations (without outliers): {avg_total_weighted_obs_no_outliers:.2f}")
-        print(f"Average GMSL_noGIA (without outliers): {avg_gmsl_noGIA_no_outliers:.2f}")
-        print(f"Average GMSL_GIA (without outliers): {avg_gmsl_GIA_no_outliers:.2f}")
-
         # Plotting the data
-        years = filtered_data['Year']
-        plt.figure(figsize=(10, 6))
-        plt.plot(years, filtered_data['TotalWeightedObservations'], label='Total Weighted Observations')
-        plt.plot(years, filtered_data['GMSL_noGIA'], label='GMSL_noGIA')
-        plt.plot(years, filtered_data['GMSL_GIA'], label='GMSL_GIA')
+        plt.figure(figsize=(12, 6))
+
+        # Plot for GMSL_noGIA
+        plt.subplot(1, 2, 1)
+        plt.plot(filtered_data['Year'], filtered_data['GMSL_noGIA'], 'bo', label='With Outliers')
+        plt.plot(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_noGIA'], 'ro', label='Without Outliers')
         plt.xlabel('Year')
-        plt.ylabel('Sea Level')
-        plt.title('Sea Level Over Time')
+        plt.ylabel('GMSL_noGIA')
+        plt.title('GMSL_noGIA')
+
+        # Line of best fit for data with outliers
+        slope, intercept, _, _, _ = linregress(filtered_data['Year'], filtered_data['GMSL_noGIA'])
+        plt.plot(filtered_data['Year'], intercept + slope * filtered_data['Year'], 'b--')
+
+        # Line of best fit for data without outliers
+        slope_no_outliers, intercept_no_outliers, _, _, _ = linregress(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_noGIA'])
+        plt.plot(filtered_data_no_outliers['Year'], intercept_no_outliers + slope_no_outliers * filtered_data_no_outliers['Year'], 'r--')
+
         plt.legend()
         plt.grid(True)
+
+        # Plot for GMSL_GIA
+        plt.subplot(1, 2, 2)
+        plt.plot(filtered_data['Year'], filtered_data['GMSL_GIA'], 'bo', label='With Outliers')
+        plt.plot(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_GIA'], 'ro', label='Without Outliers')
+        plt.xlabel('Year')
+        plt.ylabel('GMSL_GIA')
+        plt.title('GMSL_GIA')
+
+        # Line of best fit for data with outliers
+        slope, intercept, _, _, _ = linregress(filtered_data['Year'], filtered_data['GMSL_GIA'])
+        plt.plot(filtered_data['Year'], intercept + slope * filtered_data['Year'], 'b--')
+
+        # Line of best fit for data without outliers
+        slope_no_outliers, intercept_no_outliers, _, _, _ = linregress(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_GIA'])
+        plt.plot(filtered_data_no_outliers['Year'], intercept_no_outliers + slope_no_outliers * filtered_data_no_outliers['Year'], 'r--')
+
+        plt.legend()
+        plt.grid(True)
+
+        plt.tight_layout()
         plt.show()
 
     except FileNotFoundError:
