@@ -52,46 +52,26 @@ def option_c():
         # Removing outliers
         filtered_data_no_outliers = filtered_data[~((filtered_data['TotalWeightedObservations'] < (Q1 - 1.5 * IQR)) | (filtered_data['TotalWeightedObservations'] > (Q3 + 1.5 * IQR)))]
 
-        # Plotting the data
+        # Plotting
         plt.figure(figsize=(12, 6))
 
         # Plot for GMSL_noGIA
         plt.subplot(1, 2, 1)
-        plt.plot(filtered_data['Year'], filtered_data['GMSL_noGIA'], 'bo', label='With Outliers')
-        plt.plot(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_noGIA'], 'ro', label='Without Outliers')
+        plt.scatter(filtered_data['Year'], filtered_data['GMSL_noGIA'], label='Before Outliers Removal')
+        plt.scatter(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_noGIA'], label='After Outliers Removal')
         plt.xlabel('Year')
         plt.ylabel('GMSL_noGIA')
         plt.title('GMSL_noGIA')
-
-        # Line of best fit for data with outliers
-        slope, intercept, _, _, _ = linregress(filtered_data['Year'], filtered_data['GMSL_noGIA'])
-        plt.plot(filtered_data['Year'], intercept + slope * filtered_data['Year'], 'b--')
-
-        # Line of best fit for data without outliers
-        slope_no_outliers, intercept_no_outliers, _, _, _ = linregress(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_noGIA'])
-        plt.plot(filtered_data_no_outliers['Year'], intercept_no_outliers + slope_no_outliers * filtered_data_no_outliers['Year'], 'r--')
-
         plt.legend()
-        plt.grid(True)
 
         # Plot for GMSL_GIA
         plt.subplot(1, 2, 2)
-        plt.plot(filtered_data['Year'], filtered_data['GMSL_GIA'], 'bo', label='With Outliers')
-        plt.plot(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_GIA'], 'ro', label='Without Outliers')
+        plt.scatter(filtered_data['Year'], filtered_data['GMSL_GIA'], label='Before Outliers Removal')
+        plt.scatter(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_GIA'], label='After Outliers Removal')
         plt.xlabel('Year')
         plt.ylabel('GMSL_GIA')
         plt.title('GMSL_GIA')
-
-        # Line of best fit for data with outliers
-        slope, intercept, _, _, _ = linregress(filtered_data['Year'], filtered_data['GMSL_GIA'])
-        plt.plot(filtered_data['Year'], intercept + slope * filtered_data['Year'], 'b--')
-
-        # Line of best fit for data without outliers
-        slope_no_outliers, intercept_no_outliers, _, _, _ = linregress(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_GIA'])
-        plt.plot(filtered_data_no_outliers['Year'], intercept_no_outliers + slope_no_outliers * filtered_data_no_outliers['Year'], 'r--')
-
         plt.legend()
-        plt.grid(True)
 
         plt.tight_layout()
         plt.show()
