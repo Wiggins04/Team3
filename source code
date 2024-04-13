@@ -8,28 +8,385 @@ import seaborn as sns
 print ("Welcome")
 
 def option_a():
-    
+    try:
+        file_path = r'https://raw.githubusercontent.com/Wiggins04/Team3/main/sealevel.csv'
 
+        sea_level_data = pd.read_csv(file_path)
+
+        # Get the list of years available in the dataset
+        available_years = sea_level_data['Year'].unique()
+
+        year = int(input("Enter a year to calculate the average GMSL_noGIA(1993-2021): "))
+
+        # Check if the entered year is available in the dataset
+        if year not in available_years:
+            print("The entered year is not available in the dataset.")
+            option_a()
+        else:
+            data_for_year = sea_level_data[sea_level_data['Year'] == year]
+
+            # calculate average GMSL_noGIA for the specified year
+            avg_gmsl_noGIA = data_for_year['GMSL_noGIA'].mean()
+            print(f"Average GMSL_noGIA for the year {year}: {avg_gmsl_noGIA:.2f} mm")
+
+            # plot a graph of data values against total observations
+            plt.figure(figsize=(10, 6))
+            scatter = plt.scatter(data_for_year['TotalWeightedObservations'], data_for_year['GMSL_noGIA'], marker='o')
+            plt.title(f'Sea Level Values for Year {year}')
+            plt.xlabel('Total Weighted Observations')
+            plt.ylabel('Sea Level (mm)')
+            plt.grid(True)
+
+            # Add hover functionality
+            mplcursors.cursor(scatter, hover=True).connect("add", lambda sel: sel.annotation.set_text(f"Total Weighted Observations: {sel.target[0]}, GMSL_noGIA: {sel.target[1]:.2f} mm"))
+
+            plt.show()
+            mainMenu()
+
+    except Exception as e:
+        print("An error occurred:", e)
+    
 def option_b():
-    
+    try:
+        # Read data file
+        file_path = r'https://raw.githubusercontent.com/Wiggins04/Team3/main/sealevel.csv'
 
+        sea_level_data = pd.read_csv(file_path)
+
+        # Validate data columns
+        if not all(col in sea_level_data.columns for col in ['Year', 'GMSL_noGIA', 'GMSL_GIA']):
+            raise ValueError("Data missing expected columns (Year, GMSL_noGIA, GMSL_GIA)")
+
+        # Get start and end years
+        start_year = int(input("Enter the start year (1993-2021): "))
+        end_year = int(input("Enter the end year (1993-2021): "))
+        
+        # Check if end year is within range
+        while end_year > 2021:
+            print("End year cannot exceed 2021. Please enter a valid end year.")
+            option_b()
+        
+        # Group data by year and calculate the average sea level values
+        grouped_data = sea_level_data[(sea_level_data['Year'] >= start_year) & (sea_level_data['Year'] <= end_year)].groupby('Year').mean().reset_index()
+
+        # Plot sea level values against the years for GMSL_noGIA
+        plt.figure(figsize=(10, 6))
+        scatter = plt.scatter(grouped_data['Year'], grouped_data['GMSL_noGIA'], label='GMSL_noGIA', marker='o')
+
+        # Add hover functionality
+        mplcursors.cursor(scatter, hover=True).connect("add", lambda sel: sel.annotation.set_text(f"Year: {sel.target[0]}, GMSL_noGIA: {sel.target[1]:.2f} mm"))
+
+        # Calculate line of best fit for GMSL_noGIA
+        slope_noGIA, intercept_noGIA, _, _, _ = linregress(grouped_data['Year'], grouped_data['GMSL_noGIA'])
+        line_noGIA = slope_noGIA * grouped_data['Year'] + intercept_noGIA
+
+        #Titles for graph
+        plt.plot(grouped_data['Year'], line_noGIA, color='blue', linestyle='--', label='Line of Best Fit (No GIA)')
+        plt.title(f'Average Sea Level Values (No GIA) for Years {start_year}-{end_year}')
+        plt.xlabel('Year')
+        plt.ylabel('Average Sea Level (mm)')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+        # Plot sea level values against the years for GMSL_GIA
+        plt.figure(figsize=(10, 6))
+        scatter = plt.scatter(grouped_data['Year'], grouped_data['GMSL_GIA'], label='GMSL_GIA', marker='x')
+
+        # Add hover functionality
+        mplcursors.cursor(scatter, hover=True).connect("add", lambda sel: sel.annotation.set_text(f"Year: {sel.target[0]}, GMSL_GIA: {sel.target[1]:.2f} mm"))
+
+        # Calculate line of best fit for GMSL_GIA
+        slope_GIA, intercept_GIA, _, _, _ = linregress(grouped_data['Year'], grouped_data['GMSL_GIA'])
+        line_GIA = slope_GIA * grouped_data['Year'] + intercept_GIA
+
+        #Titles for graph
+        plt.plot(grouped_data['Year'], line_GIA, color='orange', linestyle='--', label='Line of Best Fit (GIA)')
+        plt.title(f'Average Sea Level Values (GIA) for Years {start_year}-{end_year}')
+        plt.xlabel('Year')
+        plt.ylabel('Average Sea Level (mm)')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+    except ValueError:
+        print("Error: Please enter valid numeric values for start and end years.")
+        option_b()
+    except Exception as e:
+        print("An error occurred:", e)
+    
+    try:
+        # Ask user if they want to continue
+        again = input("Do you want to analyze data for another period? (yes/no): ").lower()
+        if again != "yes":
+            mainMenu()
+        else:
+            option_b()
+    except Exception as e:
+        print("An error occurred:", e)
+    
 def option_c():
-   
+    try:
+        file_path = r'https://raw.githubusercontent.com/Wiggins04/Team3/main/sealevel.csv'
+        sea_level_data = pd.read_csv(file_path)
+
+        # Selecting required columns
+        selected_columns = ['Year', 'TotalWeightedObservations', 'GMSL_noGIA', 'GMSL_GIA']
+        selected_data = sea_level_data[selected_columns]
+
+        min_year = selected_data['Year'].min()
+        max_year = selected_data['Year'].max()
+
+        # Getting user input for start year with validation
+        start_year = None
+        while start_year is None:
+            try:
+                start_year = int(input(f"Enter the start year ({min_year}-{max_year}): "))
+                if start_year < min_year or start_year > max_year:
+                    print(f"Error: Start year must be between {min_year} and {max_year}.")
+                    start_year = None
+            except ValueError:
+                print("Error: Please enter a valid numeric value.")
+
+        # Getting user input for end year with validation
+        end_year = None
+        while end_year is None:
+            try:
+                end_year = int(input(f"Enter the end year ({min_year}-{max_year}): "))
+                if end_year < min_year or end_year > max_year:
+                    print(f"Error: End year must be between {min_year} and {max_year}.")
+                    end_year = None
+                    option_c()
+                elif end_year < start_year:
+                    print("Error: End year must be greater than or equal to start year.")
+                    end_year = None
+                    option_c()
+            except ValueError:
+                print("Error: Please enter a valid numeric value.")
+                option_c()
+
+        # Filtering data based on user input years
+        filtered_data = selected_data[(selected_data['Year'] >= start_year) & (selected_data['Year'] <= end_year)]
+
+        # Calculating interquartile range for TotalWeightedObservations
+        Q1 = filtered_data['TotalWeightedObservations'].quantile(0.25)
+        Q3 = filtered_data['TotalWeightedObservations'].quantile(0.75)
+        IQR = Q3 - Q1
+
+        # Removing outliers
+        filtered_data_no_outliers = filtered_data[~((filtered_data['TotalWeightedObservations'] < (Q1 - 1.5 * IQR)) | (filtered_data['TotalWeightedObservations'] > (Q3 + 1.5 * IQR)))]
+
+        # Plotting the data
+        plt.figure(figsize=(12, 12))
+
+        # Plot for GMSL_noGIA with outliers
+        plt.subplot(2, 2, 1)
+        plt.plot(filtered_data['Year'], filtered_data['GMSL_noGIA'], 'bo', label='With Outliers')
+        plt.xlabel('Year')
+        plt.ylabel('GMSL_noGIA')
+        plt.title('GMSL_noGIA with Outliers')
+        slope, intercept, _, _, _ = linregress(filtered_data['Year'], filtered_data['GMSL_noGIA'])
+        plt.plot(filtered_data['Year'], intercept + slope * filtered_data['Year'], 'r--')
+        plt.legend()
+        plt.grid(True)
+
+        # Plot for GMSL_noGIA without outliers
+        plt.subplot(2, 2, 2)
+        plt.plot(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_noGIA'], 'ro', label='Without Outliers')
+        plt.xlabel('Year')
+        plt.ylabel('GMSL_noGIA')
+        plt.title('GMSL_noGIA without Outliers')
+        slope_no_outliers, intercept_no_outliers, _, _, _ = linregress(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_noGIA'])
+        plt.plot(filtered_data_no_outliers['Year'], intercept_no_outliers + slope_no_outliers * filtered_data_no_outliers['Year'], 'b--')
+        plt.legend()
+        plt.grid(True)
+
+        # Plot for GMSL_GIA with outliers
+        plt.subplot(2, 2, 3)
+        plt.plot(filtered_data['Year'], filtered_data['GMSL_GIA'], 'bo', label='With Outliers')
+        plt.xlabel('Year')
+        plt.ylabel('GMSL_GIA')
+        plt.title('GMSL_GIA with Outliers')
+        slope, intercept, _, _, _ = linregress(filtered_data['Year'], filtered_data['GMSL_GIA'])
+        plt.plot(filtered_data['Year'], intercept + slope * filtered_data['Year'], 'r--')
+        plt.legend()
+        plt.grid(True)
+
+        # Plot for GMSL_GIA without outliers
+        plt.subplot(2, 2, 4)
+        plt.plot(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_GIA'], 'ro', label='Without Outliers')
+        plt.xlabel('Year')
+        plt.ylabel('GMSL_GIA')
+        plt.title('GMSL_GIA without Outliers')
+        slope_no_outliers, intercept_no_outliers, _, _, _ = linregress(filtered_data_no_outliers['Year'], filtered_data_no_outliers['GMSL_GIA'])
+        plt.plot(filtered_data_no_outliers['Year'], intercept_no_outliers + slope_no_outliers * filtered_data_no_outliers['Year'], 'b--')
+        plt.legend()
+        plt.grid(True)
+
+        plt.tight_layout()
+        plt.show()
+        mainMenu()
+
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+    except ValueError:
+        print("Error: Please enter valid numeric values for start and end years.")
+        option_c()
 
 def option_d():
+    # Read the dataset from the specified file path
+    file_path = r'https://raw.githubusercontent.com/Wiggins04/Team3/main/sealevel.csv'
+    data = pd.read_csv(file_path)
+
+    # Extract columns 'Year', 'GMSL_noGIA', and 'GMSL_GIA'
+    data = data[['Year', 'GMSL_noGIA', 'GMSL_GIA']]
+
+    # Function to validate user input
+    def validate_year_input(year, data):
+        available_years = data['Year'].unique()
+        if year in available_years:
+            return True
+        else:
+            return False
+
+    # Prompt the user to input start year and validate
+    while True:
+        start_year = input("Enter the start year(1993-2021): ")
+        if start_year.isdigit() and validate_year_input(int(start_year), data):
+            start_year = int(start_year)
+            break
+        else:
+            print("Invalid input. Please enter a valid start year.")
+
+    # Prompt the user to input end year and validate
+    while True:
+        end_year = input("Enter the end year(1993-2021): ")
+        if end_year.isdigit() and validate_year_input(int(end_year), data):
+            end_year = int(end_year)
+            break
+        else:
+            print("Invalid input. Please enter a valid end year.")
+    # Filter the dataset based on user input
+    filtered_data = data[(data['Year'] >= start_year) & (data['Year'] <= end_year)]
+
+    # Calculate the difference between 'GMSL_noGIA' and 'GMSL_GIA'
+    difference = filtered_data['GMSL_noGIA'].iloc[-1] - filtered_data['GMSL_GIA'].iloc[-1]
+
+    # Create a line plot for the selected data
+    plt.plot(filtered_data['Year'], filtered_data['GMSL_noGIA'], label='GMSL_noGIA')
+    plt.plot(filtered_data['Year'], filtered_data['GMSL_GIA'], label='GMSL_GIA')
+
+    # Add labels and title
+    plt.xlabel('Year')
+    plt.ylabel('Sea Level (mm)')
+    plt.title('Sea Level Comparison between GMSL_noGIA and GMSL_GIA')
+    plt.legend()
+
+    # Show plot
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+    mainMenu()
+
+
    
 def option_e():
-    
+    def validate_data(data, start_year, end_year):
+        min_year = data['Year'].min()
+        max_year = data['Year'].max()
+        return min_year <= start_year <= max_year and min_year <= end_year <= max_year
+
+
+
+       # Change path when necessary
+    file_path = r'https://raw.githubusercontent.com/Wiggins04/Team3/main/sealevel.csv'
+
+    columns_to_extract = ['Year', 'GMSL_noGIA', 'SmoothedGSML_noGIA', 'GMSL_GIA', 'SmoothedGSML_GIA', 'SmoothedGSML_GIA_sigremoved']
+
+    try:
+        # Read csv file into a data frame
+        full_data = pd.read_csv(file_path)
+
+        # Get user input for the years they want data from
+        start_year = int(input("Enter the start year(1993-2021): "))
+        end_year = int(input("Enter the end year(1993-2021): "))
+
+        # Validate user input
+        if validate_data(full_data, start_year, end_year):
+            filtered_data = full_data.loc[(full_data['Year'] >= start_year) & (full_data['Year'] <= end_year), columns_to_extract]
+            # Remove rows where GMSL_noGIA is zero to avoid any errors
+            filtered_data_noGIA = filtered_data[filtered_data['GMSL_noGIA'] != 0]
+            # Calculate average percentage change of SmoothedGSML_noGIA relative to GMSL_noGIA
+            smoothed_noGIA_avg_change = ((filtered_data_noGIA['SmoothedGSML_noGIA'] - filtered_data_noGIA['GMSL_noGIA']) / filtered_data_noGIA['GMSL_noGIA']).mean() * 100
+            # Remove rows where GMSL_GIA is zero
+            filtered_data_GIA = filtered_data[filtered_data['GMSL_GIA'] != 0]
+            # Calculate average percentage change of SmoothedGSML_GIA relative to GMSL_GIA
+            smoothed_GIA_avg_change = ((filtered_data_GIA['SmoothedGSML_GIA'] - filtered_data_GIA['GMSL_GIA']) / filtered_data_GIA['GMSL_GIA']).mean() * 100
+            # Remove rows where SmoothedGSML_GIA_sigremoved is zero
+            filtered_data_GIA_sigremoved = filtered_data[filtered_data['SmoothedGSML_GIA_sigremoved'] != 0]
+            # Calcu late average percentage change of SmoothedGSML_GIA_sigremoved relative to SmoothedGSML_GIA
+            smoothed_GIA_sigremoved_avg_change = ((filtered_data_GIA_sigremoved['SmoothedGSML_GIA_sigremoved'] - filtered_data_GIA_sigremoved['SmoothedGSML_GIA']) / filtered_data_GIA_sigremoved['SmoothedGSML_GIA']).mean() * 100
+
+            # Display the results
+            print(f"Average percentage change of SmoothedGSML_noGIA relative to GMSL_noGIA: {smoothed_noGIA_avg_change:.2f}%")
+            print(f"Average percentage change of SmoothedGSML_GIA relative to GMSL_GIA: {smoothed_GIA_avg_change:.2f}%")
+            print(f"Average percentage change of SmoothedGSML_GIA_sigremoved relative to SmoothedGSML_GIA: {smoothed_GIA_sigremoved_avg_change:.2f}%")
+            
+            # Melt the DataFrame to make it suitable for boxplot
+            melted_data = pd.melt(filtered_data, id_vars=['Year'], value_vars=['GMSL_noGIA', 'SmoothedGSML_noGIA', 'GMSL_GIA', 'SmoothedGSML_GIA', 'SmoothedGSML_GIA_sigremoved'], var_name='Variable', value_name='Value')
+
+            # Plot box plots for GMSL_noGIA and its smoothed counterpart
+            plt.figure(figsize=(12, 8))
+            sns.boxplot(data=melted_data[melted_data['Variable'].isin(['GMSL_noGIA', 'SmoothedGSML_noGIA'])], x='Year', y='Value', hue='Variable', palette='pastel')
+            plt.title('Effect of Smoothing Filter (No GIA)')
+            plt.xlabel('Year')
+            plt.ylabel('Sea Level (mm)')
+            plt.legend(title='Data Type')
+            plt.ylim(bottom=filtered_data['GMSL_noGIA'].min(), top=filtered_data['GMSL_noGIA'].max() * 1.1)  # Adjust the y-axis limits
+            plt.show()
+
+            # Plot box plots for GMSL_GIA and its smoothed counterpart
+            plt.figure(figsize=(12, 8))
+            sns.boxplot(data=melted_data[melted_data['Variable'].isin(['GMSL_GIA', 'SmoothedGSML_GIA'])], x='Year', y='Value', hue='Variable', palette='pastel')
+            plt.title('Effect of Smoothing Filter (GIA)')
+            plt.xlabel('Year')
+            plt.ylabel('Sea Level (mm)')
+            plt.legend(title='Data Type')
+            plt.ylim(bottom=filtered_data['GMSL_GIA'].min(), top=filtered_data['GMSL_GIA'].max() * 1.1)  # Adjust the y-axis limits
+            plt.show()
+
+            # Plot box plots for SmoothedGSML_GIA and SmoothedGSML_GIA_sigremoved
+            plt.figure(figsize=(12, 8))
+            sns.boxplot(data=melted_data[melted_data['Variable'].isin(['SmoothedGSML_GIA', 'SmoothedGSML_GIA_sigremoved'])], x='Year', y='Value', hue='Variable', palette='pastel')
+            plt.title('Effect of Smoothing Filter (GIA vs GIA_sigremoved)')
+            plt.xlabel('Year')
+            plt.ylabel('Sea Level (mm)')
+            plt.legend(title='Data Type')
+            plt.ylim(bottom=filtered_data['SmoothedGSML_GIA'].min(), top=filtered_data['SmoothedGSML_GIA'].max() * 1.1)  # Adjust the y-axis limits
+            plt.show()
+            mainMenu()
+
+        else:
+            print("Error: Start and end years are not within the range of available years in the dataset.")
+            option_e()
+
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+
+    except ValueError:
+        print("Error: Please enter valid numeric values for start and end years.")
+        option_e()
 
 def mainMenu():
     print ("Select an option")
-    print ("-1 OPTION A") # Replace this name later on with the function provided
-    print ("-2 OPTION B") # Replace this name later on with the function provided
-    print ("-3 OPTION C") # Replace this name later on with the function provided
-    print ("-4 Smoothing filter effect") 
-    print ("-6 OPTION E") # Replace this name later on with the function provided
-    #Any extra options should be entered here
-    print ("-4 Quit")
+    print ("-1 Average sea level for one year") 
+    print ("-2 Average sea level for multiple years")
+    print ("-3 Filtered dataset unsuitable values for total observations removed") 
+    print ("-4 Gia filter effect") 
+    print ("-5 Smoothing filter effect") 
+    print ("-6 Quit")
     while True:
         selection = input("")
         if selection == "1":
