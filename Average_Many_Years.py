@@ -74,3 +74,14 @@ def option_b():
         option_b()
     except Exception as e:
         print("An error occurred:", e)
+
+    try:
+        # Ask user if they want to continue
+        again = input("Do you want to analyze data for another period? (yes/no): ").lower()
+        if again != "yes":
+            mainMenu()
+        else:
+            option_b()
+    except Exception as e:
+        print("An error occurred:", e)
+    
