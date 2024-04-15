@@ -3,24 +3,25 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import linregress
 import mplcursors
+import seaborn as sns
 
-while True:
+print ("Welcome")
+
+def option_a():
     try:
-        file_path = r'C:\Users\CSMMHUSS\Downloads\archive.zip'
+        file_path = r'https://raw.githubusercontent.com/Wiggins04/Team3/main/sealevel.csv'
+
         sea_level_data = pd.read_csv(file_path)
 
         # Get the list of years available in the dataset
         available_years = sea_level_data['Year'].unique()
 
-        year = int(input("Enter a year to calculate the average GMSL_noGIA (or type 'exit' to quit): "))
-
-        if year == 'exit':
-            print("Exiting the program.")
-            break
+        year = int(input("Enter a year to calculate the average GMSL_noGIA(1993-2021): "))
 
         # Check if the entered year is available in the dataset
         if year not in available_years:
             print("The entered year is not available in the dataset.")
+            option_a()
         else:
             data_for_year = sea_level_data[sea_level_data['Year'] == year]
 
@@ -40,6 +41,9 @@ while True:
             mplcursors.cursor(scatter, hover=True).connect("add", lambda sel: sel.annotation.set_text(f"Total Weighted Observations: {sel.target[0]}, GMSL_noGIA: {sel.target[1]:.2f} mm"))
 
             plt.show()
+            mainMenu()
 
     except Exception as e:
         print("An error occurred:", e)
+
+option_a()
