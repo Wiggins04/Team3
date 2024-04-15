@@ -6,7 +6,7 @@ import mplcursors
 
 def option_c():
     try:
-        file_path = r'C:\Users\Patrick Baccay\sealevel.csv'
+        file_path = r'https://raw.githubusercontent.com/Wiggins04/Team3/main/sealevel.csv'
         sea_level_data = pd.read_csv(file_path)
 
         # Selecting required columns
