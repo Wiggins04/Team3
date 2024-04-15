@@ -1,14 +1,15 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Read the dataset from the specified file path
-file_path = r'C:\Users\csmjhug1\OneDrive - Liverpool John Moores University\Documents\thing\sealevel.csv'
+# Read csv
+file_path = r'https://raw.githubusercontent.com/Wiggins04/Team3/Sam-cockayne-Visualisation/sealevel.csv'
 data = pd.read_csv(file_path)
 
-# Extract columns 'Year', 'GMSL_noGIA', and 'GMSL_GIA'
+# Use columns 'Year', 'GMSL_noGIA', and 'GMSL_GIA'
 data = data[['Year', 'GMSL_noGIA', 'GMSL_GIA']]
 
-# Function to validate user input
+# Validate UI for years
 def validate_year_input(year, data):
     available_years = data['Year'].unique()
     if year in available_years:
@@ -16,42 +17,45 @@ def validate_year_input(year, data):
     else:
         return False
 
-# Prompt the user to input start year and validate
+# Ask user to input start year
 while True:
     start_year = input("Enter the start year: ")
     if start_year.isdigit() and validate_year_input(int(start_year), data):
         start_year = int(start_year)
         break
     else:
-        print("Invalid input. Please enter a valid start year.")
+        print("Invalid input. Please enter a valid start year (between 1993-2021).")
 
-# Prompt the user to input end year and validate
+# Ask user to input end year
 while True:
     end_year = input("Enter the end year: ")
     if end_year.isdigit() and validate_year_input(int(end_year), data):
         end_year = int(end_year)
         break
     else:
-        print("Invalid input. Please enter a valid end year.")
+        print("Invalid input. Please enter a valid end year (between 1993-2021).")
 
-# Filter the dataset based on user input
+# Filter the dataset based on UI
 filtered_data = data[(data['Year'] >= start_year) & (data['Year'] <= end_year)]
 
-# Calculate the difference between 'GMSL_noGIA' and 'GMSL_GIA'
-difference = filtered_data['GMSL_noGIA'].iloc[-1] - filtered_data['GMSL_GIA'].iloc[-1]
+# Melt the DataFrame to make it suitable for boxplot
+melted_data = pd.melt(filtered_data, id_vars=['Year'], 
+                      value_vars=['GMSL_noGIA', 'GMSL_GIA'], 
+                      var_name='Variable', value_name='Value')
 
-# Create a line plot for the selected data
-plt.plot(filtered_data['Year'], filtered_data['GMSL_noGIA'], label='GMSL_noGIA')
-plt.plot(filtered_data['Year'], filtered_data['GMSL_GIA'], label='GMSL_GIA')
-
-# Add labels and title
+# Plot box plots
+plt.figure(figsize=(12, 8))
+sns.boxplot(data=melted_data, x='Year', y='Value', hue='Variable', palette='pastel')
+plt.title('Sea Level Comparison between GMSL_noGIA and GMSL_GIA')
 plt.xlabel('Year')
 plt.ylabel('Sea Level (mm)')
-plt.title('Sea Level Comparison between GMSL_noGIA and GMSL_GIA')
-plt.legend()
-
-# Show plot
+plt.legend(title='Dataset')
 plt.grid(True)
 plt.tight_layout()
 plt.show()
 
+# Calculate percentage change due to GIA
+percentage_change_GIA = (filtered_data['GMSL_GIA'].iloc[-1] - filtered_data['GMSL_noGIA'].iloc[-1]) / filtered_data['GMSL_noGIA'].iloc[-1] * 100
+
+# Print percentage change due to GIA
+print(f"The percentage change due to the GIA filter is: {percentage_change_GIA:.2f}%")
