@@ -84,4 +84,6 @@ def option_b():
             option_b()
     except Exception as e:
         print("An error occurred:", e)
+
+option_b()
     
