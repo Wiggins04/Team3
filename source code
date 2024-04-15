@@ -51,4 +51,3 @@ def mainMenu():
             return
         else:
             print("Please select a valid option")
-mainMenu()#calling the main menu
