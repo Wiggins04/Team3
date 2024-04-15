@@ -24,8 +24,8 @@ def option_d():
         full_data = pd.read_csv(file_path)
 
         # Get user input for the years they want data from
-        start_year = int(input("Enter the start year: "))
-        end_year = int(input("Enter the end year: "))
+        start_year = int(input("Enter the start year(1993-2021): "))
+        end_year = int(input("Enter the end year(1993-2021): "))
 
         # Validate user input
         if validate_data(full_data, start_year, end_year):
