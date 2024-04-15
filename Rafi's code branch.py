@@ -32,13 +32,18 @@ def option_a():
             # plot a graph of data values against total observations
             plt.figure(figsize=(10, 6))
             scatter = plt.scatter(data_for_year['TotalWeightedObservations'], data_for_year['GMSL_noGIA'], marker='o')
+            
+            # Add average point
+            avg_point = plt.scatter(data_for_year['TotalWeightedObservations'].mean(), avg_gmsl_noGIA, color='red', label='Average Point')
+
             plt.title(f'Sea Level Values for Year {year}')
             plt.xlabel('Total Weighted Observations')
             plt.ylabel('Sea Level (mm)')
             plt.grid(True)
+            plt.legend()
 
             # Add hover functionality
-            mplcursors.cursor(scatter, hover=True).connect("add", lambda sel: sel.annotation.set_text(f"Total Weighted Observations: {sel.target[0]}, GMSL_noGIA: {sel.target[1]:.2f} mm"))
+            mplcursors.cursor([scatter, avg_point], hover=True).connect("add", lambda sel: sel.annotation.set_text(f"Total Weighted Observations: {sel.target[0]}, GMSL_noGIA: {sel.target[1]:.2f} mm"))
 
             plt.show()
             mainMenu()
