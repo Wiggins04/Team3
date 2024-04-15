@@ -37,3 +37,40 @@ def option_b():
         # Calculate line of best fit for GMSL_noGIA
         slope_noGIA, intercept_noGIA, _, _, _ = linregress(grouped_data['Year'], grouped_data['GMSL_noGIA'])
         line_noGIA = slope_noGIA * grouped_data['Year'] + intercept_noGIA
+
+  #Titles for graph
+        plt.plot(grouped_data['Year'], line_noGIA, color='blue', linestyle='--', label='Line of Best Fit (No GIA)')
+        plt.title(f'Average Sea Level Values (No GIA) for Years {start_year}-{end_year}')
+        plt.xlabel('Year')
+        plt.ylabel('Average Sea Level (mm)')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+        # Plot sea level values against the years for GMSL_GIA
+        plt.figure(figsize=(10, 6))
+        scatter = plt.scatter(grouped_data['Year'], grouped_data['GMSL_GIA'], label='GMSL_GIA', marker='x')
+
+        # Add hover functionality
+        mplcursors.cursor(scatter, hover=True).connect("add", lambda sel: sel.annotation.set_text(f"Year: {sel.target[0]}, GMSL_GIA: {sel.target[1]:.2f} mm"))
+
+        # Calculate line of best fit for GMSL_GIA
+        slope_GIA, intercept_GIA, _, _, _ = linregress(grouped_data['Year'], grouped_data['GMSL_GIA'])
+        line_GIA = slope_GIA * grouped_data['Year'] + intercept_GIA
+
+        #Titles for graph
+        plt.plot(grouped_data['Year'], line_GIA, color='orange', linestyle='--', label='Line of Best Fit (GIA)')
+        plt.title(f'Average Sea Level Values (GIA) for Years {start_year}-{end_year}')
+        plt.xlabel('Year')
+        plt.ylabel('Average Sea Level (mm)')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+    except ValueError:
+        print("Error: Please enter valid numeric values for start and end years.")
+        option_b()
+    except Exception as e:
+        print("An error occurred:", e)
