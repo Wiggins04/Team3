@@ -10,3 +10,5 @@ Sam-cockayne-visualisation.
 Patrick-Baccay-Visualisation
 Before trying to run my algorithm it is imperative to use Visual Studio and install the following libraries/modules: pandas, matplotlib, , numpy, scipy, and mplcursors. Once those are installed, from the menu select option 3. From there you will be asked to enter a start and an end year between 1993-2021. The user input is validated to minimise errors, ensuring that the user does not enter anything outside of the dataset. 4 graphs will then appear showing a line of best fit for each.
 
+ Rafi-Hussain-Visualisation 
+ Before running my algorithm (which is option 1) install the following modules: pandas, matplotlib, , numpy, scipy, seaborn and mplcursors. Once those are installed and the program has been run, from the menu select option 1. From there you will be asked to enter 1993-2021. The user input is validated to minimise errors, ensuring that the user does not enter anything outside of the dataset. one graph will appear as well as the calculation of the average in the teminal. 
