@@ -13,4 +13,10 @@ Before trying to run my algorithm it is imperative to use Visual Studio and inst
  Rafi-Hussain-Visualisation 
  Before running my algorithm (which is option 1) install the following modules: pandas, matplotlib, , numpy, scipy, seaborn and mplcursors. Once those are installed and the program has been run, from the menu select option 1. From there you will be asked to enter 1993-2021. The user input is validated to minimise errors, ensuring that the user does not enter anything outside of the dataset. one graph will appear as well as the calculation of the average in the teminal. 
 
+ Cai-Wiggins
+ To run my algorithm which is option 2, you will need to install pandas, matplotlib, numpy, scipy, seaborn and mplcursors. The operation starts on the main menu, where you would select option 2, this would then ask you to input a start year, then the end year. After inputting this info, there will be two graphs, one with GIA and the other without GIA. If the user inputs an incorrect date, they will be given an error message and will be asked if they want to search for other dates instead. Once the program has run, the user is asked to either search other dates, or go back to the main menu.
+
+
+ 
+
 Thomas-Coffey- algorithm with specific year/ range functionality and graph: Ensure Python and Visual Studio are installed, and install the required libraries(pandas, matplotlib, numpy, scipy, mplcursors) After running the code, you'll be prompted to choose between viewing a graph or inputting a specific year or range. If you select the graph option, a plot showing the sea level change over time will be displayed. If you choose to input a year or range, you'll be asked to input a specific/range of years, and the program will calculate and display the average sea level change accordingly.
